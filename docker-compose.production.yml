@@ -31,3 +31,4 @@ services:
       - media_production:/app/media/
     ports:
       - 7000:80
+      
