@@ -30,5 +30,4 @@ services:
       - static_production:/staticfiles/
       - media_production:/app/media/
     ports:
-      - 7000:80
-      
+      - 8000:80
