@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_backend_and_push_to_docker_hub:
-    name: Push Docker image to DockerHub
+    name: Push backend Docker image to DockerHub
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
