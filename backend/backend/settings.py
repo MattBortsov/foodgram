@@ -14,8 +14,6 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-BASE_URL = os.getenv('BASE_URL')
-
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
@@ -123,3 +121,9 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
 }
+
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
+
+SECURE_SSL_REDIRECT = True
+
+BASE_URL = os.getenv('BASE_URL')
