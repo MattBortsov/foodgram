@@ -15,7 +15,7 @@ from api.serializers import (
     IngredientSerializer, PasswordSerializer, RecipeCreateSerializer,
     RecipeSerializer, RecipeShortSerializer, ShoppingCartSerializer,
     TagSerializer, UpdateAvatarSerializer, UserRecipeSerializer,
-    UsersSerializer,
+    UsersSerializer, RecipeShortLink
 )
 from api.shopping_list_formatter import format_shopping_list
 from recipes.models import (
@@ -37,6 +37,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_user(self):
         return self.request.user
+
+    def create(self, request, *args, **kwargs):
+        """Метод для создания пользователя."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        User.objects.create_user(**serializer.validated_data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(
         methods=('get',),
@@ -225,12 +232,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('get',),
         detail=True,
         permission_classes=(AllowAny,),
-        url_path='get-link'
+        url_path='short-link'
     )
     def get_short_link(self, request, *args, **kwargs):
         """Получение короткой ссылки для рецепта."""
         recipe = self.get_object()
-        return Response({'short_link': recipe.short_link})
+        serializer = RecipeShortLink(recipe)
+        return Response({'short_link': serializer.data['short_link']})
 
     @action(
         methods=['get'],

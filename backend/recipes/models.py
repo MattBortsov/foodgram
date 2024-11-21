@@ -1,12 +1,11 @@
 import uuid
 
-from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.constants import (
     COOKING_MIN_TIME, INGREDIENT_LENGTH, MEASUREMENT_LENGTH, RECIPE_LENGTH,
-    SHORT_LINK_LENGTH, TAG_NAME,
+    SHORT_LINK_CODE_LENGTH, TAG_NAME,
 )
 from users.models import User
 
@@ -76,8 +75,8 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         related_name='recipes'
     )
-    short_link = models.CharField(
-        max_length=SHORT_LINK_LENGTH,
+    short_link_code = models.CharField(
+        max_length=SHORT_LINK_CODE_LENGTH,
         blank=True, null=True, unique=True
     )
 
@@ -86,20 +85,17 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
         ordering = ['-pub_date']
 
-    def generate_short_link(self):
-        """Генерация короткой ссылки для рецепта."""
-        base_url = settings.BASE_URL
+    def generate_short_link_code(self):
+        """Генерация короткого кода для рецепта."""
         max_attempts = 5
         for attempt in range(max_attempts):
             short_code = uuid.uuid4().hex[:3]
-            short_link = f'{base_url}/s/{short_code}'
-            if not Recipe.objects.filter(short_link=short_link).exists():
-                return short_link
+            if not Recipe.objects.filter(short_link_code=short_code).exists():
+                return short_code
         while True:
             short_code = uuid.uuid4().hex[:4]
-            short_link = f'{base_url}/s/{short_code}'
-            if not Recipe.objects.filter(short_link=short_link).exists():
-                return short_link
+            if not Recipe.objects.filter(short_link_code=short_code).exists():
+                return short_code
 
     def save(self, *args, **kwargs):
         """Сохранение короткой ссылки для рецепта в модели."""
