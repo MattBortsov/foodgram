@@ -245,7 +245,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'ingredients', 'tags', 'image',
             'name', 'text', 'cooking_time'
         )
-    read_only_fields = ('author', 'is_favorited', 'is_in_shopping_cart')
 
     def validate_image(self, value):
         """Проверяем наличие картинки."""

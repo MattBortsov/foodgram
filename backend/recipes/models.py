@@ -97,12 +97,6 @@ class Recipe(models.Model):
             if not Recipe.objects.filter(short_link_code=short_code).exists():
                 return short_code
 
-    def save(self, *args, **kwargs):
-        """Сохранение короткой ссылки для рецепта в модели."""
-        if not self.short_link:
-            self.short_link = self.generate_short_link()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
