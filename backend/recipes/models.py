@@ -87,15 +87,18 @@ class Recipe(models.Model):
 
     def generate_short_link_code(self):
         """Генерация короткого кода для рецепта."""
-        max_attempts = 5
-        for attempt in range(max_attempts):
-            short_code = uuid.uuid4().hex[:3]
-            if not Recipe.objects.filter(short_link_code=short_code).exists():
-                return short_code
-        while True:
+        existing_codes = set(
+            Recipe.objects.values_list('short_link_code', flat=True)
+        )
+        short_code = uuid.uuid4().hex[:3]
+        while short_code in existing_codes:
             short_code = uuid.uuid4().hex[:4]
-            if not Recipe.objects.filter(short_link_code=short_code).exists():
-                return short_code
+        return short_code
+
+    def save(self, *args, **kwargs):
+        if not self.short_link_code:
+            self.short_link_code = self.generate_short_link_code()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

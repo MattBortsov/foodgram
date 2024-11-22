@@ -229,9 +229,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return queryset
 
     @action(
-        methods=('get',),
+        methods=['get'],
         detail=True,
-        permission_classes=(AllowAny,)
+        permission_classes=(AllowAny,),
+        url_path='get-link'
     )
     def get_short_link(self, request, *args, **kwargs):
         """Получение короткой ссылки для рецепта."""

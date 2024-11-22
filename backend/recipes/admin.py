@@ -26,5 +26,6 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
 
+    @admin.display(description='Сохранений')
     def get_favorite_count(self, obj):
         return obj.favorite_recipes.count()
