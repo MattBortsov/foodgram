@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag, RecipeIngredient
+
+
+class RecipeIngredientInline(admin.TabularInline):
+    """Inline модель для ингредиентов рецепта."""
+    model = RecipeIngredient
+    extra = 1
+    min_num = 1
+    fields = ('ingredient', 'amount')
 
 
 @admin.register(Ingredient)
@@ -25,6 +33,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_editable = ('author',)
     search_fields = ('name', 'author__username')
     list_filter = ('tags',)
+    inlines = [RecipeIngredientInline]
 
     @admin.display(description='Сохранений')
     def get_favorite_count(self, obj):

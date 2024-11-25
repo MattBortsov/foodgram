@@ -13,7 +13,7 @@ class Command(BaseCommand):
     INGREDIENT_ALREADY_EXISTS = 'Ингредиент "{name}" уже существует.'
 
     def handle(self, *args, **kwargs):
-        file_path = settings.BASE_DIR / 'data/ingredients.json'
+        file_path = settings.BASE_DIR / 'static/data/ingredients.json'
         with open(file_path, 'r', encoding='utf-8') as file:
             ingredients = json.load(file)
             for ingredient_data in ingredients:

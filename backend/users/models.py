@@ -1,23 +1,20 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.db.models import F, Q
 
-from core.constants import LENGTH_EMAIL, LENGTH_NAME
+from core.constants import LENGTH_NAME
 from users.validators import validate_username
 
 
 class User(AbstractUser):
     """Модель пользователя."""
-    class Role(models.TextChoices):
-        USER = 'user', 'Пользователь'
-        ADMIN = 'admin', 'Администратор'
-
-    email = models.EmailField(unique=True, max_length=LENGTH_EMAIL)
+    email = models.EmailField(unique=True)
     username = models.CharField(
         'Имя пользователя',
         max_length=LENGTH_NAME,
         unique=True,
-        validators=[validate_username]
+        validators=[UnicodeUsernameValidator]
     )
     first_name = models.CharField(
         'Имя',
@@ -32,12 +29,8 @@ class User(AbstractUser):
         upload_to='users/',
         blank=True, null=True
     )
-    role = models.CharField(
-        'Роль',
-        max_length=LENGTH_NAME,
-        choices=Role.choices,
-        default=Role.USER
-    )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -46,14 +39,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-    @property
-    def is_admin(self):
-        return (
-            self.role == self.Role.ADMIN
-            or self.is_superuser
-            or self.is_staff
-        )
 
 
 class Follow(models.Model):
