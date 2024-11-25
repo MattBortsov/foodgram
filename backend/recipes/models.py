@@ -1,12 +1,12 @@
 import uuid
 
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from core.constants import (
-    COOKING_MIN_TIME, COOKING_MAX_TIME, INGREDIENT_LENGTH, MEASUREMENT_LENGTH,
-    RECIPE_LENGTH, SHORT_LINK_CODE_LENGTH, TAG_NAME, INGREDIENT_MIN_AMOUNT,
-    INGREDIENT_MAX_AMOUNT
+    COOKING_MAX_TIME, COOKING_MIN_TIME, INGREDIENT_LENGTH,
+    INGREDIENT_MAX_AMOUNT, INGREDIENT_MIN_AMOUNT, MEASUREMENT_LENGTH,
+    RECIPE_LENGTH, SHORT_LINK_CODE_LENGTH, TAG_NAME,
 )
 from users.models import User
 

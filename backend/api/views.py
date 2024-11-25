@@ -9,16 +9,15 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from api.filters import IngredientFilterSet, RecipeFilter
+from api.handler import handle_recipe_action
 from api.pagination import CustomPagination
 from api.permissions import IsAuthorAdminOrReadOnly
 from api.serializers import (
-    FollowSerializer, IngredientSerializer,
-    RecipeCreateSerializer, RecipeSerializer,
-    ShoppingCartSerializer, FavoriteRecipeSerializer, TagSerializer,
-    UpdateAvatarSerializer, UsersSerializer
+    FavoriteRecipeSerializer, FollowSerializer, IngredientSerializer,
+    RecipeCreateSerializer, RecipeSerializer, ShoppingCartSerializer,
+    TagSerializer, UpdateAvatarSerializer, UsersSerializer,
 )
 from api.shopping_list_formatter import format_shopping_list
-from api.handler import handle_recipe_action
 from recipes.models import (
     FavoriteRecipe, Ingredient, Recipe, ShoppingCart, Tag,
 )

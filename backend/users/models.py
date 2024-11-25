@@ -4,7 +4,6 @@ from django.db import models
 from django.db.models import F, Q
 
 from core.constants import LENGTH_NAME
-from users.validators import validate_username
 
 
 class User(AbstractUser):
