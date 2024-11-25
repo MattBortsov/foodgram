@@ -82,9 +82,9 @@ class UsersViewSet(UserViewSet):
         detail=True,
         permission_classes=[IsAuthenticated]
     )
-    def subscribe(self, request, pk=None):
+    def subscribe(self, request, id=None):
         user = self.request.user
-        following = get_object_or_404(User, id=pk)
+        following = get_object_or_404(User, id=id)
         serializer = FollowSerializer(
             data={'user': user.id, 'following': following.id},
             context={'request': request}
@@ -94,9 +94,9 @@ class UsersViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
-    def delete_subscribe(self, request, pk=None):
+    def delete_subscribe(self, request, id=None):
         user = self.request.user
-        following = get_object_or_404(User, id=pk)
+        following = get_object_or_404(User, id=id)
         deleted, _ = user.following.filter(following=following).delete()
         if not deleted:
             return Response(

@@ -63,6 +63,8 @@ class UserRecipeSerializer(UserSerializer):
     recipes_count = serializers.IntegerField(
         read_only=True, source='recipes.count'
     )
+    is_subscribed = serializers.SerializerMethodField(
+        default=False, read_only=True)
 
     class Meta:
         model = User
@@ -81,6 +83,15 @@ class UserRecipeSerializer(UserSerializer):
         return RecipeShortSerializer(
             recipes, many=True, context=self.context
         ).data
+
+    def get_is_subscribed(self, obj):
+        """Выявляем подписан ли текущий пользователь на просматриваемого."""
+        request = self.context.get('request')
+        return (
+            request
+            and request.user.is_authenticated
+            and request.user.followers.filter(following=obj).exists()
+        )
 
 
 class FollowSerializer(serializers.ModelSerializer):
