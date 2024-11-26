@@ -252,8 +252,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT)
 
 
-def redirect_short_url(request, short_url):
+def redirect_short_url(request, short_link):
     """Перенаправление по короткой ссылке на рецепт."""
-    recipe = get_object_or_404(Recipe, short_link_code=short_url)
+    recipe = get_object_or_404(Recipe, short_link_code=short_link)
     full_url = request.build_absolute_uri(f'/recipes/{recipe.id}/')
     return HttpResponseRedirect(full_url)

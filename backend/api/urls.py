@@ -17,5 +17,5 @@ v1_router.register('ingredients', IngredientViewSet, basename='ingredients')
 urlpatterns = [
     path('', include(v1_router.urls)),
     path('auth/', include('djoser.urls.authtoken')),
-    path('r/<str:short_link>/', redirect_short_url, name='recipe_redirect'),
+    path('s/<str:short_link>/', redirect_short_url, name='recipe_redirect'),
 ]
