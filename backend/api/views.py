@@ -9,7 +9,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from api.filters import IngredientFilterSet, RecipeFilter
-from api.handler import handle_recipe_action
 from api.pagination import CustomPagination
 from api.permissions import IsAuthorAdminOrReadOnly
 from api.serializers import (
@@ -160,7 +159,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     )
                 )
             )
-        print(queryset.query)
         return queryset
 
     @action(methods=['get'], detail=True, url_path='get-link')
@@ -198,18 +196,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk=None):
         """Добавить рецепт в корзину."""
-        return handle_recipe_action(
-            request, pk, 'add', 'shopping_carts', ShoppingCartSerializer,
-            'Рецепт добавлен в корзину.', 'Рецепт уже в корзине.'
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        serializer = ShoppingCartSerializer(
+            data={'user': user.id, 'recipe': recipe.id}
         )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk=None):
         """Удалить рецепт из корзины."""
-        return handle_recipe_action(
-            request, pk, 'remove', 'shopping_carts', ShoppingCartSerializer,
-            'Рецепт успешно удален из корзины.', 'Рецепт не найден в корзине.'
-        )
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        deleted, _ = user.shopping_carts.filter(recipe=recipe).delete()
+        if not deleted:
+            return Response(
+                {'detail': 'Рецепт не найден в корзине.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            {'detail': 'Рецепт успешно удален из корзины.'},
+            status=status.HTTP_204_NO_CONTENT)
 
     @action(
         methods=['post'],
@@ -218,19 +227,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk=None):
         """Добавить рецепт в избранное."""
-        return handle_recipe_action(
-            request, pk, 'add', 'favorite_recipes', FavoriteRecipeSerializer,
-            'Рецепт добавлен в избранное.', 'Рецепт уже в избранном.'
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        serializer = FavoriteRecipeSerializer(
+            data={'user': user.id, 'recipe': recipe.id}
         )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk=None):
         """Удалить рецепт из избранного."""
-        return handle_recipe_action(
-            request, pk, 'remove', 'favorite_recipes',
-            FavoriteRecipeSerializer, 'Рецепт успешно удален из избранного.',
-            'Рецепт не найден в избранном.'
-        )
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        deleted, _ = user.favorite_recipes.filter(recipe=recipe).delete()
+        if not deleted:
+            return Response(
+                {'detail': 'Рецепт не найден в избранном.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            {'detail': 'Рецепт успешно удален из избранного.'},
+            status=status.HTTP_204_NO_CONTENT)
 
 
 def redirect_short_url(request, short_url):

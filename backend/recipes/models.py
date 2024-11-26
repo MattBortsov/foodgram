@@ -185,18 +185,6 @@ class AbstractRecipeRelation(models.Model):
 
 class FavoriteRecipe(AbstractRecipeRelation):
     """Промежуточная модель Избранного рецепта."""
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Пользователь'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        verbose_name='Рецепт'
-    )
-
     class Meta:
         default_related_name = 'favorite_recipes'
         verbose_name = 'Избранный рецепт'

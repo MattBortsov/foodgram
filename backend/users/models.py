@@ -17,11 +17,11 @@ class User(AbstractUser):
     )
     first_name = models.CharField(
         'Имя',
-        max_length=LENGTH_NAME, blank=False
+        max_length=LENGTH_NAME
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=LENGTH_NAME, blank=False
+        max_length=LENGTH_NAME
     )
     avatar = models.ImageField(
         'Аватар',

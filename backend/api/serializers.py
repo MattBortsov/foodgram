@@ -19,7 +19,7 @@ class RecipeShortSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class UsersSerializer(UserSerializer):
+class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор для модели User."""
     avatar = Base64ImageField(required=False, allow_null=True)
     is_subscribed = serializers.SerializerMethodField(
@@ -57,14 +57,12 @@ class UpdateAvatarSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserRecipeSerializer(UserSerializer):
+class UserRecipeSerializer(UsersSerializer):
     """Сериализатор модели Пользователь."""
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(
         read_only=True, source='recipes.count'
     )
-    is_subscribed = serializers.SerializerMethodField(
-        default=False, read_only=True)
 
     class Meta:
         model = User
@@ -83,15 +81,6 @@ class UserRecipeSerializer(UserSerializer):
         return RecipeShortSerializer(
             recipes, many=True, context=self.context
         ).data
-
-    def get_is_subscribed(self, obj):
-        """Выявляем подписан ли текущий пользователь на просматриваемого."""
-        request = self.context.get('request')
-        return (
-            request
-            and request.user.is_authenticated
-            and request.user.followers.filter(following=obj).exists()
-        )
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -261,6 +250,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 class ShoppingCartFavoriteSerializer(serializers.ModelSerializer):
     """Базовый сериализатор для добавления рецептов в корзину или избранное."""
+
+    class Meta:
+        fields = ('user', 'recipe')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=None,
+                fields=['user', 'recipe'],
+                message='Вы уже добавили этот рецепт.'
+            )
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Meta.validators[0].queryset = self.get_queryset()
+
     def to_representation(self, instance):
         """Представление рецепта в ответе."""
         return RecipeShortSerializer(
@@ -269,27 +273,17 @@ class ShoppingCartFavoriteSerializer(serializers.ModelSerializer):
 
 class ShoppingCartSerializer(ShoppingCartFavoriteSerializer):
     """Сериализатор для списка покупок."""
-    class Meta:
+    class Meta(ShoppingCartFavoriteSerializer.Meta):
         model = ShoppingCart
-        fields = ('user', 'recipe')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=ShoppingCart.objects.all(),
-                fields=['user', 'recipe'],
-                message='Вы уже добавили этот рецепт в корзину.'
-            )
-        ]
+
+    def get_queryset(self):
+        return ShoppingCart.objects.all()
 
 
 class FavoriteRecipeSerializer(ShoppingCartFavoriteSerializer):
     """Сериализатор для подписчиков."""
-    class Meta:
+    class Meta(ShoppingCartFavoriteSerializer.Meta):
         model = FavoriteRecipe
-        fields = ('user', 'recipe')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=FavoriteRecipe.objects.all(),
-                fields=['user', 'recipe'],
-                message='Вы уже добавили этот рецепт в избранное.'
-            )
-        ]
+
+    def get_queryset(self):
+        return FavoriteRecipe.objects.all()
