@@ -1,6 +1,6 @@
 from django.db.models import Exists, F, OuterRef, Sum
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
@@ -255,5 +255,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
 def redirect_short_url(request, short_link):
     """Перенаправление по короткой ссылке на рецепт."""
     recipe = get_object_or_404(Recipe, short_link_code=short_link)
-    full_url = request.build_absolute_uri(f'/recipes/{recipe.id}/')
-    return HttpResponseRedirect(full_url)
+    return redirect(f'/recipes/{recipe.id}/')
